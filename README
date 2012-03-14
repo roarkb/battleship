@@ -1,0 +1,20 @@
+welcome to command-line battleship!
+
+the first and current phase of this project involves simply playing battleship with your computer enemy AI.
+future phases will include the computer AI facing off against itself and an API or wrapper-script that will 
+face different AI's against each other.  i encourage you all to contribute your own AI's once i figure out
+the API/common terms they all should speak.
+
+usage:
+"./battleship" => regular mode
+"./battleship" debug => debug mode
+
+notes:
+- currently works much better mac/linux due to the fact that i am using the "clear" system call to add 
+dramatic effect to my game 
+
+homepage:
+http://roark.sleptlate.org/battleship
+
+contact:
+roarkb@gmail.com
