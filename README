@@ -7,7 +7,7 @@ the API/common terms they all should speak.
 
 usage:
 "./battleship" => regular mode
-"./battleship" debug => debug mode
+"./battleship debug" => debug mode
 
 notes:
 - currently works much better mac/linux due to the fact that i am using the "clear" system call to add 
