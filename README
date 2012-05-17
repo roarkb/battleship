@@ -10,7 +10,7 @@ usage:
 "./battleship debug" => debug mode
 
 notes:
-- currently works much better mac/linux due to the fact that i am using the "clear" system call to add 
+- currently works much better on mac/linux due to the fact that i am using the "clear" system call to add 
 dramatic effect to my game 
 
 homepage:
