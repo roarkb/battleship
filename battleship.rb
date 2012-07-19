@@ -1,4 +1,4 @@
-#!/usr/bin/ruby -w
+#!/usr/bin/env ruby
 
 
 
@@ -230,7 +230,7 @@ a = []
        A -> Arcraft Carrier | #{a[0]} | #{a[1]} |
        B -> Battleship      | #{a[2]} | #{a[3]} |
        S -> Submarine       | #{a[4]} | #{a[5]} |
-       C -> Cruiser          | #{a[6]} | #{a[7]} |
+       C -> Cruiser         | #{a[6]} | #{a[7]} |
        D -> Destroyer       | #{a[8]} | #{a[9]} |\n\n"
   puts " " * ind + "#{HIT} -> Hit"
   puts " " * ind + "#{MISS} -> Miss\n\n"
