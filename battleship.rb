@@ -60,7 +60,7 @@ SHIPS = {   # length, symbol, display_name
   :carrier    => [ 5, "A", "Arcraft Carrier" ],
   :battleship => [ 4, "B", "Battleship" ],
   :submarine  => [ 3, "S", "Submarine" ],
-  :cruiser    => [ 3, "C", "Cruier" ],
+  :cruiser    => [ 3, "C", "Cruiser" ],
   :destroyer  => [ 2, "D", "Destroyer" ]
 }
 
@@ -230,7 +230,7 @@ a = []
        A -> Arcraft Carrier | #{a[0]} | #{a[1]} |
        B -> Battleship      | #{a[2]} | #{a[3]} |
        S -> Submarine       | #{a[4]} | #{a[5]} |
-       C -> Cruier          | #{a[6]} | #{a[7]} |
+       C -> Cruiser          | #{a[6]} | #{a[7]} |
        D -> Destroyer       | #{a[8]} | #{a[9]} |\n\n"
   puts " " * ind + "#{HIT} -> Hit"
   puts " " * ind + "#{MISS} -> Miss\n\n"
