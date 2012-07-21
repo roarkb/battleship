@@ -11,10 +11,4 @@ usage:
 
 notes:
 - currently works much better on mac/linux due to the fact that i am using the "clear" system call to add 
-dramatic effect to my game 
-
-homepage:
-http://roark.sleptlate.org/battleship
-
-contact:
-roarkb@gmail.com
+dramatic effect to my game
