@@ -11,8 +11,8 @@ class Battleship2
   def initialize(ai1, ai2)
     @board1 = Board.new
     @board2 = Board.new
-    @ai1 = Object.const_get(ai1.capitalize).new(@board1, @board2)
-    @ai2 = Object.const_get(ai2.capitalize).new(@board2, @board1)
+    @ai1 = Object.const_get(ai1).new(@board1, @board2)
+    @ai2 = Object.const_get(ai2).new(@board2, @board1)
   end
 
   def start

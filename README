@@ -12,3 +12,14 @@ usage:
 notes:
 - currently works much better on mac/linux due to the fact that i am using the "clear" system call to add 
 dramatic effect to my game
+
+
+
+now there is a new battleship2 with pluggable AIs
+usage:
+./battleship2.rb Random Human # this pits a human against the Random AI.  The arguments are the AI classnames.
+
+to write an ai, create a class in ais/ that inherits from AI.  It should implement:
+place_ships (no parameters, should return an array of Ships)
+move(previous_hit, previous_sink) (params tell you if prev shot hit and/or sunk a ship), should return an x,y pair.
+(optional) init (use if your AI needs to initialize something)

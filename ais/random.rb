@@ -4,9 +4,12 @@ class Random < AI
     @ships = []
     [5,4,3,3,2].each do |ship_size|
       # no do-while in ruby
-      new_ship = create_ship(ship_size)
-      while @ships.any?{|ship| ship.intersects?(new_ship)}
+      new_ship = nil
+      loop do
+        # TODO I've tried this a couple ways, and it still sometimes puts ships on top of ships
+        # I don't think the problem is in ship.rb, because ai.rb uses that to expose the issue.
         new_ship = create_ship(ship_size)
+        break if @ships.all?{|ship| !ship.intersects?(new_ship)}
       end
       @ships << new_ship
     end

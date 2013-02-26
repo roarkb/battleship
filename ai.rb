@@ -4,6 +4,9 @@ class AI
     #TODO is dangerous to allow ais direct access to boards - they could cheat
     @player_board = player_board
     @enemy_board = enemy_board
+    if self.respond_to? :init
+      init
+    end
   end
 
   def do_place_ships
