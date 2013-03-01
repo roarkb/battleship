@@ -22,6 +22,7 @@ class Finisher < Random
       @first_hit_y = nil
       @prev_hit_x = nil
       @prev_hit_y = nil
+      #puts 'Sunk a ship.  Turning off move near hit mode'
       @move_near_hit = false
     end
 
@@ -30,6 +31,7 @@ class Finisher < Random
     if @move_near_hit
       x, y = move_near_hit
       if x.nil? # guess there was nowhere near to move
+      #puts 'nowhere to move.  Turning off move near hit mode'
         @move_near_hit = false
         @first_hit_x = nil
         @first_hit_y = nil
@@ -51,6 +53,7 @@ class Finisher < Random
   end
 
   def move_near_hit
+    #puts "moving near hit"
     if @first_hit_x == @prev_hit_x and @first_hit_y == @prev_hit_y
       if @prev_hit_x < 9 and !@enemy_board.shots[@prev_hit_x+1][@prev_hit_y]
         return @prev_hit_x+1, @prev_hit_y
@@ -63,6 +66,7 @@ class Finisher < Random
       end
     else
       if @first_hit_x == @prev_hit_x
+        #puts "shooting in y direction"
         # shooting in y direction
         if @prev_hit_y > @first_hit_y
           if !@enemy_board.shots[@prev_hit_x][@prev_hit_y+1]
@@ -78,6 +82,7 @@ class Finisher < Random
           end
         end
       else
+        #puts "shooting in x direction"
         # shooting in x direction
         if @prev_hit_x > @first_hit_x 
           if !@enemy_board.shots[@prev_hit_x+1][@prev_hit_y]
@@ -94,7 +99,7 @@ class Finisher < Random
         end
       end
     end
-#uh oh
+    #puts "UH OH"
     return nil, nil
   end
 

@@ -20,15 +20,19 @@ class Battleship2
     @ai2.do_place_ships
     turn_count = 0
     while !@board1.ships.all?{|s| s.sunk}
-#      @board1.display
-#      @board2.display
+      puts "#{ai1.class}'s ships:"
+      @board1.display
+      puts "#{ai2.class}'s ships:"
+      @board2.display
       @ai1.do_move
       break if @board2.ships.all?{|s| s.sunk}
       @ai2.do_move
       turn_count += 1
     end
 
+    puts "#{ai1.class}'s ships:"
     @board1.display
+    puts "#{ai2.class}'s ships:"
     @board2.display
     if @board1.ships.all?{|s| s.sunk}
       puts "Player 2 (#{@ai2.class}) wins after #{turn_count} turns."
@@ -41,10 +45,10 @@ end
 
 begin
   game = Battleship2.new(ARGV[0], ARGV[1])
+  game.start
 rescue NameError => e
   puts "No AI found matching parameter."
   raise e
   exit 1
 end
 
-game.start

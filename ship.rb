@@ -45,7 +45,7 @@ class Ship
     else
       (0..ship.length-1).each do |x_offset|
         if self.contains_point(ship.x+x_offset, ship.y)
-          return false
+          return true
         end
       end
     end
