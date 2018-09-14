@@ -54,12 +54,10 @@ end
 def place_ships
   # start off with empty 10x10 grid
   grid = Array.new(10) { Array.new(10) }
-  placement = []
 
   # place ships in random order
   SHIPS.keys.shuffle.each do |k|
-    symbol = k.to_s.upcase # eg. 'B'
-    placement.clear
+    placement = []
 
     # choose random unused starting point
     y, x = rand(0..9), rand(0..9)
@@ -68,21 +66,18 @@ def place_ships
       y, x = rand(0..9), rand(0..9)
     end
 
-    # place first
-    grid[y][x] = symbol
-    placement << [ y, x ]
+    placement << [ y, x ] # place first
 
     # choose random adjacent point
-    next_y, next_x  = [ [ y + 1, x ], [ y - 1, x ], [ y, x + 1 ], [ y, x - 1 ] ].sample
+    next_y, next_x = [ [ y + 1, x ], [ y - 1, x ], [ y, x + 1 ], [ y, x - 1 ] ].sample
 
     # is it unused and on-grid?
-    if grid[next_y][next_x].nil? && next_y.between?(0, 9) && next_x.between?(0, 9)
-      # place second
-      grid[next_y][next_x] = symbol
+    if next_y.between?(0, 9) && next_x.between?(0, 9) && grid[next_y][next_x].nil?
       placement << [ next_y, next_x ] # place second
     end
 
     p placement
+    placement.each { |e| grid[e.first][e.last] = k.to_s.upcase }
 
   end
 
@@ -92,6 +87,10 @@ end
 puts
 
 print_grid(place_ships)
+
+#grid = Array.new(10) { Array.new(10) }
+#grid[0][0] = 'B'
+#p grid[0][-1].nil?
 
 
 
