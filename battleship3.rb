@@ -7,7 +7,7 @@ require 'pp'
 SHIPS = {
   :a => { :length => 5, :name => 'Arcraft Carrier' },
   :b => { :length => 4, :name => 'Battleship' },
-  :s => { :lentgh => 3, :name => 'Submarine' },
+  :s => { :length => 3, :name => 'Submarine' },
   :c => { :length => 3, :name => 'Cruiser' },
   :d => { :length => 2, :name => 'Destroyer' }
 }
@@ -58,27 +58,72 @@ def place_ships
   # place ships in random order
   SHIPS.keys.shuffle.each do |k|
     placement = []
+    length = SHIPS[k][:length]
 
-    # choose random unused starting point
-    y, x = rand(0..9), rand(0..9)
+    until placement.length == length
+      placement.clear
 
-    until grid[y][x].nil?
-      y, x = rand(0..9), rand(0..9)
+      # choose random unused starting point
+      y1, x1 = rand(0..9), rand(0..9)
+
+      until grid[y1][x1].nil?
+        y1, x1 = rand(0..9), rand(0..9)
+      end
+
+      placement << [ y1, x1 ] # place first
+
+      # choose random adjacent point
+      y2, x2 = [ [ y1 + 1, x1 ], [ y1 - 1, x1 ], [ y1, x1 + 1 ], [ y1, x1 - 1 ] ].sample
+
+      # is it unused and on-grid?
+      if y2.between?(0, 9) && x2.between?(0, 9) && grid[y2][x2].nil?
+        placement << [ y2, x2 ] # place 2nd
+
+        if length > 2
+          choose_next_yx = lambda do
+            placement.sort!
+
+            yx =
+              if placement[0][0] == placement[1][0] # horizontal
+                [ [ placement[0][0], placement[0][1] - 1 ], [ placement[0][0], placement[-1][1] + 1 ] ].sample
+              else # vertical
+                [ [ placement[0][0] - 1, placement[0][1] ], [ placement[-1][0] + 1, placement[0][1] ] ].sample
+              end
+
+            {
+              :placable => yx.first.between?(0, 9) && yx.last.between?(0, 9) && grid[yx.first][yx.last].nil?,
+              :yx => yx
+            }
+          end
+
+          next_yx = choose_next_yx.call
+
+          if next_yx[:placable]
+            placement << next_yx[:yx]
+
+            if length > 3
+              next_yx = choose_next_yx.call
+
+              if next_yx[:placable]
+                placement << next_yx[:yx]
+
+                if length > 4
+                  next_yx = choose_next_yx.call
+                  placement << next_yx[:yx] if next_yx[:placable]
+                end
+              end
+            end
+          end
+        end
+      end
     end
 
-    placement << [ y, x ] # place first
-
-    # choose random adjacent point
-    next_y, next_x = [ [ y + 1, x ], [ y - 1, x ], [ y, x + 1 ], [ y, x - 1 ] ].sample
-
-    # is it unused and on-grid?
-    if next_y.between?(0, 9) && next_x.between?(0, 9) && grid[next_y][next_x].nil?
-      placement << [ next_y, next_x ] # place second
-    end
-
-    p placement
     placement.each { |e| grid[e.first][e.last] = k.to_s.upcase }
 
+    p k.to_s.upcase
+    p length
+    p placement
+    puts
   end
 
   grid
@@ -138,5 +183,5 @@ def print_board(player_data, enemy_data, score, indent = 4)
 end
 
 #puts
-#board(ships, ships, score, 4)
+#print_board(ships, ships, score, 4)
 #puts
