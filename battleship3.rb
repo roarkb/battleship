@@ -12,20 +12,6 @@ SHIPS = {
   :d => { :length => 2, :name => 'Destroyer' }
 }
 
-
-ships = [
-  [ 'B', nil, nil, nil, nil, nil, nil, nil, nil, nil ],
-  [ 'B', nil, nil, nil, nil, nil, nil, nil, nil, nil ],
-  [ 'B', nil, nil, nil, nil, nil, nil, nil, 'S', nil ],
-  [ 'B', nil, nil, nil, nil, nil, nil, nil, 'S', nil ],
-  [ nil, nil, nil, nil, nil, nil, nil, nil, 'S', nil ],
-  [ nil, nil, nil, nil, nil, nil, nil, nil, nil, nil ],
-  [ nil, nil, 'A', 'A', 'A', 'A', 'A', nil, nil, nil ],
-  [ nil, nil, nil, nil, nil, nil, nil, nil, nil, nil ],
-  [ nil, nil, nil, nil, nil, nil, nil, nil, nil, nil ],
-  [ nil, nil, 'C', 'C', 'C', nil, nil, nil, 'D', 'D' ]
-]
-
 #$score = { :player => {}, :enemy => {} }
 
 score = {
@@ -39,6 +25,8 @@ score = {
   }
 }
 
+# display single 10x10 grid
+# use for player ship placment
 def print_grid(data, indent = 4)
   chr_id = 97 # => 'a'
 
@@ -51,6 +39,49 @@ def print_grid(data, indent = 4)
   end
 end
 
+# display main game board
+def print_board(player_data, enemy_data, score, indent = 4)
+  chr_id = 97 # => 'a'
+  score_indent = ' ' * (indent + 12)
+  score_btwdent = ' ' * (indent + 20)
+  score_div = '+---+-----------------+'
+  score_border = score_indent + score_div + score_btwdent + score_div
+  board_header = "#{' ' * (indent + 5)}#{[*1..10].join('   ')}"
+  board_div = "#{' ' * (indent + 3)}#{'+---' * 10}+"
+
+  puts <<~EOF
+    #{' ' * (indent + 20)}PLAYER#{' ' * (indent + 39)}ENEMY
+
+    #{score_border}
+  EOF
+
+  SHIPS.each do |k, v|
+    puts "#{score_indent}| #{score[:player][k] ? score[:player][k] : ' '} | #{v[:name].ljust(15)} |" \
+         "#{score_btwdent}| #{score[:enemy][k] ? score[:enemy][k] : ' '} | #{v[:name].ljust(15)} |"
+  end
+
+  puts <<~EOF
+    #{score_border}
+
+    #{board_header}#{board_header}
+    #{board_div}#{board_div}
+  EOF
+
+  (0..9).each do |i|
+    pre = "#{' ' * indent}#{chr_id.chr}  | "
+
+    # replace all nils with ' '
+    player_row = player_data[i].map { |x| ' ' unless x }
+    enemy_row = enemy_data[i].map { |x| ' ' unless x }
+
+    puts "#{pre}#{player_data[i].map { |x| x ? x : ' ' }.join(' | ')} |" \
+         "#{pre}#{enemy_data[i].map { |x| x ? x : ' ' }.join(' | ')} |\n#{board_div}#{board_div}"
+
+    chr_id += 1
+  end
+end
+
+# place ships randomly in a 10x10 grid
 def place_ships
   # start off with empty 10x10 grid
   grid = Array.new(10) { Array.new(10) }
@@ -60,6 +91,9 @@ def place_ships
     placement = []
     length = SHIPS[k][:length]
 
+    # attempt to choose available on-grid positions
+    # only move onto the next position if the previous one succeeded
+    # repeat until you get it right
     until placement.length == length
       placement.clear
 
@@ -80,6 +114,10 @@ def place_ships
         placement << [ y2, x2 ] # place 2nd
 
         if length > 2
+
+          # anon function to choose randomly between the positions
+          # on either end of the already chosen positions
+          # return position and bool => is position available and on-grid?
           choose_next_yx = lambda do
             placement.sort!
 
@@ -99,17 +137,17 @@ def place_ships
           next_yx = choose_next_yx.call
 
           if next_yx[:placable]
-            placement << next_yx[:yx]
+            placement << next_yx[:yx] # place 3rd
 
             if length > 3
               next_yx = choose_next_yx.call
 
               if next_yx[:placable]
-                placement << next_yx[:yx]
+                placement << next_yx[:yx] # place 4th
 
-                if length > 4
+                if length == 5
                   next_yx = choose_next_yx.call
-                  placement << next_yx[:yx] if next_yx[:placable]
+                  placement << next_yx[:yx] if next_yx[:placable] # place 5th
                 end
               end
             end
@@ -118,70 +156,13 @@ def place_ships
       end
     end
 
-    placement.each { |e| grid[e.first][e.last] = k.to_s.upcase }
-
-    p k.to_s.upcase
-    p length
-    p placement
-    puts
+    placement.each { |e| grid[e.first][e.last] = k.to_s.upcase } # place all
   end
 
   grid
 end
 
 puts
-
-print_grid(place_ships)
-
-#grid = Array.new(10) { Array.new(10) }
-#grid[0][0] = 'B'
-#p grid[0][-1].nil?
-
-
-
-
+#print_grid(place_ships)
+print_board(place_ships, place_ships, score, 4)
 puts
-
-def print_board(player_data, enemy_data, score, indent = 4)
-  chr_id = 97 # => 'a'
-  score_indent = ' ' * (indent + 12)
-  score_btwdent = ' ' * (indent + 20)
-  score_border = "#{score_indent}+---+-----------------+#{score_btwdent}+---+-----------------+"
-  num_header = "#{' ' * (indent + 5)}#{[*1..10].join('   ')}"
-  div = "#{' ' * (indent + 3)}#{'+---' * 10}+"
-
-  puts <<~EOF
-    #{' ' * (indent + 20)}PLAYER#{' ' * (indent + 39)}ENEMY
-
-    #{score_border}
-  EOF
-
-  SHIPS.each do |k, v|
-    puts "#{score_indent}| #{score[:player][k] ? score[:player][k] : ' '} | #{v[:name].ljust(15)} |" \
-         "#{score_btwdent}| #{score[:enemy][k] ? score[:enemy][k] : ' '} | #{v[:name].ljust(15)} |"
-  end
-
-  puts <<~EOF
-    #{score_border}
-
-    #{num_header}#{num_header}
-    #{div}#{div}
-  EOF
-
-  (0..9).each do |i|
-    pre = "#{' ' * indent}#{chr_id.chr}  | "
-
-    # replace all nils with ' '
-    player_row = player_data[i].map { |x| ' ' unless x }
-    enemy_row = enemy_data[i].map { |x| ' ' unless x }
-
-    puts "#{pre}#{player_data[i].map { |x| x ? x : ' ' }.join(' | ')} |" \
-         "#{pre}#{enemy_data[i].map { |x| x ? x : ' ' }.join(' | ')} |\n#{div}#{div}"
-
-    chr_id += 1
-  end
-end
-
-#puts
-#print_board(ships, ships, score, 4)
-#puts
