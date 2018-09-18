@@ -2,8 +2,6 @@
 
 require 'pp'
 
-#system('clear')
-
 SHIPS = {
   :a => { :length => 5, :name => 'Arcraft Carrier' },
   :b => { :length => 4, :name => 'Battleship' },
@@ -12,45 +10,35 @@ SHIPS = {
   :d => { :length => 2, :name => 'Destroyer' }
 }
 
-#$score = { :player => {}, :enemy => {} }
-
-score = {
-  :player => {
-    :a => 'x',
-    :s => 'x'
-  },
-  :enemy => {
-    :b => 'x',
-    :d => 'x'
-  }
-}
+INDENT = 4
+TRUE_FALSE = [ true, false ].sample # random bool decider
 
 # display single 10x10 grid
 # use for player ship placment
-def print_grid(data, indent = 4)
+def print_grid(data)
   chr_id = 97 # => 'a'
 
-  puts "#{' ' * (indent + 5)}#{[*1..10].join('   ')}"
-  puts div = "#{' ' * (indent + 3)}#{'+---' * 10}+"
+  puts "#{' ' * (INDENT + 5)}#{[*1..10].join('   ')}"
+  puts div = "#{' ' * (INDENT + 3)}#{'+---' * 10}+"
 
   data.each do |row|
-    puts "#{' ' * indent}#{chr_id.chr}  | #{row.map { |x| x ? x : ' ' }.join(' | ')} |\n#{div}"
+    puts "#{' ' * INDENT}#{chr_id.chr}  | #{row.map { |x| x ? x : ' ' }.join(' | ')} |\n#{div}"
     chr_id += 1
   end
 end
 
 # display main game board
-def print_board(player_data, enemy_data, score, indent = 4)
+def print_board(player_data, enemy_data, score)
   chr_id = 97 # => 'a'
-  score_indent = ' ' * (indent + 12)
-  score_btwdent = ' ' * (indent + 20)
+  score_indent = ' ' * (INDENT + 12)
+  score_btwdent = ' ' * (INDENT + 20)
   score_div = '+---+-----------------+'
   score_border = score_indent + score_div + score_btwdent + score_div
-  board_header = "#{' ' * (indent + 5)}#{[*1..10].join('   ')}"
-  board_div = "#{' ' * (indent + 3)}#{'+---' * 10}+"
+  board_header = "#{' ' * (INDENT + 5)}#{[*1..10].join('   ')}"
+  board_div = "#{' ' * (INDENT + 3)}#{'+---' * 10}+"
 
   puts <<~EOF
-    #{' ' * (indent + 20)}PLAYER#{' ' * (indent + 39)}ENEMY
+    #{' ' * (INDENT + 20)}PLAYER#{' ' * (INDENT + 39)}ENEMY
 
     #{score_border}
   EOF
@@ -68,7 +56,7 @@ def print_board(player_data, enemy_data, score, indent = 4)
   EOF
 
   (0..9).each do |i|
-    pre = "#{' ' * indent}#{chr_id.chr}  | "
+    pre = "#{' ' * INDENT}#{chr_id.chr}  | "
 
     # replace all nils with ' '
     player_row = player_data[i].map { |x| ' ' unless x }
@@ -129,25 +117,25 @@ def place_ships
               end
 
             {
-              :placable => yx.first.between?(0, 9) && yx.last.between?(0, 9) && grid[yx.first][yx.last].nil?,
+              :available => yx.first.between?(0, 9) && yx.last.between?(0, 9) && grid[yx.first][yx.last].nil?,
               :yx => yx
             }
           end
 
           next_yx = choose_next_yx.call
 
-          if next_yx[:placable]
+          if next_yx[:available]
             placement << next_yx[:yx] # place 3rd
 
             if length > 3
               next_yx = choose_next_yx.call
 
-              if next_yx[:placable]
+              if next_yx[:available]
                 placement << next_yx[:yx] # place 4th
 
                 if length == 5
                   next_yx = choose_next_yx.call
-                  placement << next_yx[:yx] if next_yx[:placable] # place 5th
+                  placement << next_yx[:yx] if next_yx[:available] # place 5th
                 end
               end
             end
@@ -162,7 +150,64 @@ def place_ships
   grid
 end
 
+# generate array of all [ x, y ] positions that the AI can choose from
+# if easy, choose all positions
+# if hard, choose only diagonal positions
+def choose_positions(difficult = true)
+  if difficult
+    (0..9).each_with_object([]) do |y, a|
+      x_row =
+        if TRUE_FALSE
+          y.even? ? [ 0, 2, 4, 6, 8 ] : [ 1, 3, 5, 7, 9 ]
+        else
+          y.odd? ? [ 0, 2, 4, 6, 8 ] : [ 1, 3, 5, 7, 9 ]
+        end
+
+      x_row.each { |x| a << [ y, x ] }
+    end
+  else
+    (0..9).each_with_object([]) { |y, a| (0..9).each { |x| a << [ y, x ] } }
+  end
+end
+
+
+# ------------- TEST -------------
+
+
+
+
+#system('clear')
+#$score = { :player => {}, :enemy => {} }
+
+score = {
+  :player => {
+    :a => 'x',
+    :s => 'x'
+  },
+  :enemy => {
+    :b => 'x',
+    :d => 'x'
+  }
+}
+
 puts
+
+#grid = Array.new(10) { Array.new(10) }
+#grid[rand(0..9)][rand(0..9)] = 'X'
+#
+#print_grid(grid)
+
+grid = Array.new(10) { Array.new(10) }
+
+pp (0..9).to_a.map { |y| (0..9).to_a.map { |x| [ y, x ] } }
+
+#positions = choose_positions(true)
+#positions.each { |e| grid[e.first][e.last] = 'X' }
+#
+#puts
+#
+#print_grid(grid)
+
 #print_grid(place_ships)
-print_board(place_ships, place_ships, score, 4)
+#print_board(place_ships, place_ships, score)
 puts
