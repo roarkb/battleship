@@ -12,6 +12,7 @@ SHIPS = {
 
 INDENT = 4
 TRUE_FALSE = [ true, false ].sample # random bool decider
+DEBUG = ARGV.first ? true : false
 
 # display single 10x10 grid
 # use for player ship placment
@@ -28,7 +29,7 @@ def print_grid(data)
 end
 
 # display main game board
-def print_board(player_data, enemy_data, score)
+def print_board
   chr_id = 97 # => 'a'
   score_indent = ' ' * (INDENT + 12)
   score_btwdent = ' ' * (INDENT + 20)
@@ -44,8 +45,8 @@ def print_board(player_data, enemy_data, score)
   EOF
 
   SHIPS.each do |k, v|
-    puts "#{score_indent}| #{score[:player][k] ? score[:player][k] : ' '} | #{v[:name].ljust(15)} |" \
-         "#{score_btwdent}| #{score[:enemy][k] ? score[:enemy][k] : ' '} | #{v[:name].ljust(15)} |"
+    puts "#{score_indent}| #{$score[:player][k][:sunk] ? 'x' : ' '} | #{v[:name].ljust(15)} |" \
+         "#{score_btwdent}| #{$score[:enemy][k][:sunk] ? 'x' : ' '} | #{v[:name].ljust(15)} |"
   end
 
   puts <<~EOF
@@ -59,11 +60,24 @@ def print_board(player_data, enemy_data, score)
     pre = "#{' ' * INDENT}#{chr_id.chr}  | "
 
     # replace all nils with ' '
-    player_row = player_data[i].map { |x| ' ' unless x }
-    enemy_row = enemy_data[i].map { |x| ' ' unless x }
+    player_row = $player_data[i].map { |x| ' ' unless x }
+    enemy_row = $enemy_data[i].map { |x| ' ' unless x }
 
-    puts "#{pre}#{player_data[i].map { |x| x ? x : ' ' }.join(' | ')} |" \
-         "#{pre}#{enemy_data[i].map { |x| x ? x : ' ' }.join(' | ')} |\n#{board_div}#{board_div}"
+    puts "#{pre}#{$player_data[i].map { |x| x ? x : ' ' }.join(' | ')} |" \
+         "#{pre}#{$enemy_data[i].map do |value|
+            if DEBUG
+              value ? value : ' '
+            else
+              case value
+                when nil
+                  ' '
+                when 'A', 'B', 'S', 'C', 'D'
+                  $score[:enemy][value.downcase.to_sym][:sunk] ? value : ' '
+              else
+                value
+              end
+            end
+         end.join(' | ')} |\n#{board_div}#{board_div}"
 
     chr_id += 1
   end
@@ -150,11 +164,9 @@ def place_ships
   grid
 end
 
-# generate array of all [ x, y ] positions that the AI can choose from
-# if easy, choose all positions
-# if hard, choose only diagonal positions
-def choose_positions(difficult = true)
-  if difficult
+# generate array of all [ y, x ] positions that the enemy can choose from when taking a turn
+def generate_available_positions(difficult = true)
+  if difficult # choose only diagonal positions
     (0..9).each_with_object([]) do |y, a|
       x_row =
         if TRUE_FALSE
@@ -165,42 +177,90 @@ def choose_positions(difficult = true)
 
       x_row.each { |x| a << [ y, x ] }
     end
-  else
+  else # choose all positions
     (0..9).each_with_object([]) { |y, a| (0..9).each { |x| a << [ y, x ] } }
   end
 end
 
+def update_score
+  $score.each_value do |player|
+    player.each do |k, v|
+      v[:sunk] = true if (v[:sunk] == false && v[:hits] >= SHIPS[k][:length])
+    end
+  end
+end
 
 # ------------- TEST -------------
 
+# take normal turn, write to grid and return true if hit, fail if miss
+def normal_turn(available_positions, grid)
+  # choose random available position and remove it from list of available positions
+  y, x = available_positions.delete(available_positions.sample)
 
-
+  if grid[y][x] # hit
+    grid[y][x] = 'x'
+    true
+  else # miss
+    grid[y][x] = '*'
+    false
+  end
+end
 
 #system('clear')
-#$score = { :player => {}, :enemy => {} }
 
-score = {
+# [ 'c', false]
+# [ 'c', true ]
+# [ nil, false]
+# [ nil, true ]
+#
+# { :value => 'c' }
+# { :value => 'c', :hit => true }
+# { :value => nil }
+# { :valus => nil, :hit => true }
+#
+# nil
+# [ nil, true ]
+# 'c'
+# [ 'c', true ]
+
+
+$score = {
   :player => {
-    :a => 'x',
-    :s => 'x'
+    :a => { :hits => 0, :sunk => false },
+    :b => { :hits => 0, :sunk => false },
+    :s => { :hits => 0, :sunk => false },
+    :c => { :hits => 0, :sunk => false },
+    :d => { :hits => 0, :sunk => false }
   },
   :enemy => {
-    :b => 'x',
-    :d => 'x'
+    :a => { :hits => 0, :sunk => true },
+    :b => { :hits => 0, :sunk => false },
+    :s => { :hits => 0, :sunk => false },
+    :c => { :hits => 0, :sunk => false },
+    :d => { :hits => 0, :sunk => false }
   }
 }
 
+$player_data = place_ships
+$enemy_data = place_ships
+
+#
 puts
+update_score
+
+puts
+
+puts
+
+print_board
 
 #grid = Array.new(10) { Array.new(10) }
 #grid[rand(0..9)][rand(0..9)] = 'X'
 #
 #print_grid(grid)
-
-grid = Array.new(10) { Array.new(10) }
-
-pp (0..9).to_a.map { |y| (0..9).to_a.map { |x| [ y, x ] } }
-
+#
+#grid = Array.new(10) { Array.new(10) }
+#
 #positions = choose_positions(true)
 #positions.each { |e| grid[e.first][e.last] = 'X' }
 #
