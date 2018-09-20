@@ -57,27 +57,42 @@ def print_board
   EOF
 
   (0..9).each do |i|
-    pre = "#{' ' * INDENT}#{chr_id.chr}  | "
+    print "#{' ' * INDENT}#{chr_id.chr}  | "
 
-    # replace all nils with ' '
-    player_row = $player_data[i].map { |x| ' ' unless x }
-    enemy_row = $enemy_data[i].map { |x| ' ' unless x }
+    $player_data[i].each do |value|
+      print_value =
+        case value
+          when nil # empty
+            ' '
+          when Symbol # occupied
+            value.to_s.upcase
+        else # hit OR miss
+          value
+        end
 
-    puts "#{pre}#{$player_data[i].map { |x| x ? x : ' ' }.join(' | ')} |" \
-         "#{pre}#{$enemy_data[i].map do |value|
-            if DEBUG
-              value ? value : ' '
-            else
-              case value
-                when nil
-                  ' '
-                when 'A', 'B', 'S', 'C', 'D'
-                  $score[:enemy][value.downcase.to_sym][:sunk] ? value : ' '
-              else
-                value
-              end
-            end
-         end.join(' | ')} |\n#{board_div}#{board_div}"
+      print "#{print_value} | "
+    end
+
+    print "#{' ' * (INDENT - 1)}#{chr_id.chr}  | "
+
+    $enemy_data[i].map do |value|
+      print_value =
+        if DEBUG
+          value ? value : ' '
+        else
+          case value
+            when nil, Symbol # empty OR occupied
+              ' '
+            when Array # hit
+              $score[:enemy][value][:sunk] ? value.to_s.upcase : 'x'
+          else # miss
+            value
+          end
+        end
+      print "#{print_value} | "
+    end
+
+    puts "\n#{board_div}#{board_div}"
 
     chr_id += 1
   end
@@ -85,7 +100,7 @@ end
 
 # place ships randomly in a 10x10 grid
 def place_ships
-  # start off with empty 10x10 grid
+    # start off with empty 10x10 grid
   grid = Array.new(10) { Array.new(10) }
 
   # place ships in random order
@@ -158,7 +173,7 @@ def place_ships
       end
     end
 
-    placement.each { |e| grid[e.first][e.last] = k.to_s.upcase } # place all
+    placement.each { |e| grid[e.first][e.last] = k } # place all
   end
 
   grid
@@ -222,6 +237,16 @@ end
 # [ nil, true ]
 # 'c'
 # [ 'c', true ]
+#
+# nil => empty
+# '*' => miss
+# :c => occupied
+# [ :c, 'x' ] => hit
+
+# nil => empty
+# '*' => miss
+# :c => occupied
+# [ :c ] => hit
 
 
 $score = {
