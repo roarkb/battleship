@@ -59,7 +59,7 @@ def print_board
   (0..9).each do |i|
     print "#{' ' * INDENT}#{chr_id.chr}  | "
 
-    $player_data[i].each do |value|
+    $player_grid[i].each do |value|
       print_value =
         case value
           when nil # empty
@@ -75,16 +75,25 @@ def print_board
 
     print "#{' ' * (INDENT - 1)}#{chr_id.chr}  | "
 
-    $enemy_data[i].map do |value|
+    $enemy_grid[i].map do |value|
       print_value =
-        if DEBUG
-          value ? value : ' '
+        if DEBUG # display enemy board like player board
+          case value
+            when nil # empty
+              ' '
+            when Symbol # occupied
+              value.to_s.upcase
+            when Array
+              'x'
+          else # miss
+            value
+          end
         else
           case value
             when nil, Symbol # empty OR occupied
               ' '
             when Array # hit
-              $score[:enemy][value][:sunk] ? value.to_s.upcase : 'x'
+              $score[:enemy][value.first][:sunk] ? value.first.to_s.upcase : 'x'
           else # miss
             value
           end
@@ -205,21 +214,48 @@ def update_score
   end
 end
 
-# ------------- TEST -------------
-
 # take normal turn, write to grid and return true if hit, fail if miss
-def normal_turn(available_positions, grid)
+def enemy_move
   # choose random available position and remove it from list of available positions
-  y, x = available_positions.delete(available_positions.sample)
+  y, x = $available_positions.delete($available_positions.sample)
 
-  if grid[y][x] # hit
-    grid[y][x] = 'x'
+  if $player_grid[y][x] # hit
+    $player_grid[y][x] = 'x'
+
     true
   else # miss
-    grid[y][x] = '*'
+    $player_grid[y][x] = '*'
+
     false
   end
 end
+
+def player_move
+
+print 'player move> '
+
+  y, x = gets.chomp.split('')
+  p y
+  p x
+
+  p value = $enemy_grid[y][x]
+
+  case value
+    when nil # miss
+      puts 'miss'
+      $enemy_grid[y][x] = '*'
+    when Symbol # hit
+      puts 'hit'
+      $enemy_grid[y][x] = [ value ]
+    when Array, '*' # you already shot there
+      puts 'try again'
+  else
+    puts 'oops'
+  end
+end
+
+
+# ------------- TEST -------------
 
 #system('clear')
 
@@ -259,40 +295,18 @@ $score = {
   },
   :enemy => {
     :a => { :hits => 0, :sunk => true },
-    :b => { :hits => 0, :sunk => false },
-    :s => { :hits => 0, :sunk => false },
-    :c => { :hits => 0, :sunk => false },
-    :d => { :hits => 0, :sunk => false }
+    :b => { :hits => 0, :sunk => true },
+    :s => { :hits => 0, :sunk => true },
+    :c => { :hits => 0, :sunk => true },
+    :d => { :hits => 0, :sunk => true }
   }
 }
 
-$player_data = place_ships
-$enemy_data = place_ships
-
-#
-puts
-update_score
+$player_grid = place_ships
+$enemy_grid = place_ships
+$available_positions = generate_available_positions
 
 puts
 
-puts
-
-print_board
-
-#grid = Array.new(10) { Array.new(10) }
-#grid[rand(0..9)][rand(0..9)] = 'X'
-#
-#print_grid(grid)
-#
-#grid = Array.new(10) { Array.new(10) }
-#
-#positions = choose_positions(true)
-#positions.each { |e| grid[e.first][e.last] = 'X' }
-#
-#puts
-#
-#print_grid(grid)
-
-#print_grid(place_ships)
-#print_board(place_ships, place_ships, score)
+player_move
 puts
