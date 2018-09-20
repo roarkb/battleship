@@ -231,13 +231,34 @@ def enemy_move
 end
 
 def player_move
+  counter = 0
+  msg = [
+    'Invalid input. Please enter a letter + integer combination: [a-j][1-10]',
+    %{That's... still invalid. You need to enter a lowercase letter between 'a' and 'j' and a number between 1 and 10},
+    "Dude! just type #{('a'..'j').to_a.sample}#{rand(1..10)}"
+  ]
 
-print 'player move> '
 
-  y, x = gets.chomp.split('')
-  p y
-  p x
+  10.times do
+    print 'player move> '
+    input = gets.chomp.chars
+    y = ('a'..'j').to_a.index(input.delete_at(0))
+    x = input.join.to_i - 1
 
+    p y
+    p x
+    puts
+
+    if y && x && y.between?(0, 9) && x.between?(0, 9)
+      p 'y'
+      break
+    else
+      p msg[counter]
+      counter += 1
+    end
+  end
+
+  exit
   p value = $enemy_grid[y][x]
 
   case value
