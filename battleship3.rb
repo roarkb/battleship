@@ -232,28 +232,43 @@ end
 
 def player_move
   counter = 0
+
   msg = [
     'Invalid input. Please enter a letter + integer combination: [a-j][1-10]',
-    %{That's... still invalid. You need to enter a lowercase letter between 'a' and 'j' and a number between 1 and 10},
-    "Dude! just type #{('a'..'j').to_a.sample}#{rand(1..10)}"
+
+    "That's still invalid. You need to enter a lowercase letter between 'a' and
+  'j' followed by a number between 1 and 10.",
+
+    "Dude! just type like #{('a'..'j').to_a.sample}#{rand(1..10)} or something.",
+
+    'Wow!, you are really dense.',
+
+    "You don't even want to play Battleship do you? You instead derive joy from
+  inputing garbage over and over just to see how I will react.",
+
+    "I feel so empty inside.",
+
+    "broken...",
+
+    "Alright smart ass. I'm done taking your abuse. You have ONE MORE chance to
+  enter a PROPER battleship move or else I'm gonna go back to sleep.",
+
+    "Goodnight forever!"
   ]
 
 
-  10.times do
+  msg.length.times do
     print 'player move> '
     input = gets.chomp.chars
     y = ('a'..'j').to_a.index(input.delete_at(0))
     x = input.join.to_i - 1
 
-    p y
-    p x
-    puts
-
     if y && x && y.between?(0, 9) && x.between?(0, 9)
       p 'y'
       break
     else
-      p msg[counter]
+      puts "  #{msg[counter]}\n\n"
+
       counter += 1
     end
   end
@@ -306,6 +321,8 @@ end
 # [ :c ] => hit
 
 
+# set game state and do it with global vars
+
 $score = {
   :player => {
     :a => { :hits => 0, :sunk => false },
@@ -329,5 +346,4 @@ $available_positions = generate_available_positions
 
 puts
 
-player_move
 puts
