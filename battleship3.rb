@@ -109,7 +109,7 @@ end
 
 # place ships randomly in a 10x10 grid
 def place_ships
-    # start off with empty 10x10 grid
+  # start off with empty 10x10 grid
   grid = Array.new(10) { Array.new(10) }
 
   # place ships in random order
@@ -343,7 +343,6 @@ $score = {
 $player_grid = place_ships
 $enemy_grid = place_ships
 $available_positions = generate_available_positions
-
 puts
-
+player_move
 puts
