@@ -1,4 +1,4 @@
-require 'lib/util'
+require_relative 'util'
 
 # base class for all AIs to ensure that rules are followed and a player does not
 # have direct access to opponent's grid
@@ -21,11 +21,9 @@ class Player
   # return x, y
   def attack
     y, x = turn
-
   end
 
   def respond(y, x) # (0-9, 0-9)
-
   end
 
   # methods to be overwritten by individual AI classes to implement their special strategies
@@ -39,6 +37,5 @@ class Player
   # defaults to choosing a random available on-grid position
   # return an y, x coordinate [(0..9), (0..9)]
   def turn
-
   end
 end

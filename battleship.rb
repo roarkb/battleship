@@ -2,7 +2,7 @@
 
 require 'pp'
 
-require 'lib/util'
+require_relative 'lib/util'
 
 include Util
 
@@ -27,7 +27,7 @@ def print_grid(data)
   puts div = "#{' ' * (INDENT + 3)}#{'+---' * 10}+"
 
   data.each do |row|
-    puts "#{' ' * INDENT}#{chr_id.chr}  | #{row.map { |x| x ? x : ' ' }.join(' | ')} |\n#{div}"
+    puts "#{' ' * INDENT}#{chr_id.chr}  | #{row.map { |x| x || ' ' }.join(' | ')} |\n#{div}"
     chr_id += 1
   end
 end
@@ -49,8 +49,8 @@ def print_board
   EOF
 
   SHIPS.each do |k, v|
-    puts "#{score_indent}| #{$score[:player][k][:sunk] ? 'x' : ' '} | #{v[:name].ljust(15)} |" \
-         "#{score_btwdent}| #{$score[:enemy][k][:sunk] ? 'x' : ' '} | #{v[:name].ljust(15)} |"
+    puts "#{score_indent}| #{@score[:player][k][:sunk] ? 'x' : ' '} | #{v[:name].ljust(15)} |" \
+         "#{score_btwdent}| #{@score[:enemy][k][:sunk] ? 'x' : ' '} | #{v[:name].ljust(15)} |"
   end
 
   puts <<~EOF
@@ -63,7 +63,7 @@ def print_board
   (0..9).each do |i|
     print "#{' ' * INDENT}#{chr_id.chr}  | "
 
-    $player_grid[i].each do |value|
+    @player_grid[i].each do |value|
       print_value =
         case value
           when nil # empty
@@ -79,7 +79,7 @@ def print_board
 
     print "#{' ' * (INDENT - 1)}#{chr_id.chr}  | "
 
-    $enemy_grid[i].map do |value|
+    @enemy_grid[i].map do |value|
       print_value =
         if DEBUG # display enemy board like player board
           case value
@@ -97,7 +97,7 @@ def print_board
             when nil, Symbol # empty OR occupied
               ' '
             when Array # hit
-              $score[:enemy][value.first][:sunk] ? value.first.to_s.upcase : 'x'
+              @score[:enemy][value.first][:sunk] ? value.first.to_s.upcase : 'x'
           else # miss
             value
           end
@@ -130,9 +130,9 @@ def generate_available_positions(difficult = true)
 end
 
 def update_score
-  $score.each_value do |player|
+  @score.each_value do |player|
     player.each do |k, v|
-      v[:sunk] = true if (v[:sunk] == false && v[:hits] >= SHIPS[k][:length])
+      v[:sunk] = true if v[:sunk] == false && v[:hits] >= SHIPS[k][:length]
     end
   end
 end
@@ -140,14 +140,14 @@ end
 # take normal turn, write to grid and return true if hit, fail if miss
 def enemy_move
   # choose random available position and remove it from list of available positions
-  y, x = $available_positions.delete($available_positions.sample)
+  y, x = @available_positions.delete(@available_positions.sample)
 
-  if $player_grid[y][x] # hit
-    $player_grid[y][x] = 'x'
+  if @player_grid[y][x] # hit
+    @player_grid[y][x] = 'x'
 
     true
   else # miss
-    $player_grid[y][x] = '*'
+    @player_grid[y][x] = '*'
 
     false
   end
@@ -169,16 +169,15 @@ def player_move
     "You don't even want to play Battleship do you? You instead derive joy from
   inputing garbage over and over just to see how I will react.",
 
-    "I feel so empty inside.",
+    'I feel so empty inside.',
 
-    "broken...",
+    'broken...',
 
     "Alright smart ass. I'm done taking your abuse. You have ONE MORE chance to
   enter a PROPER battleship move or else I'm gonna go back to sleep.",
 
-    "Goodnight forever!"
+    'Goodnight forever!'
   ]
-
 
   msg.length.times do
     print 'player move> '
@@ -197,22 +196,21 @@ def player_move
   end
 
   exit
-  p value = $enemy_grid[y][x]
+  p value = @enemy_grid[y][x]
 
   case value
     when nil # miss
       puts 'miss'
-      $enemy_grid[y][x] = '*'
+      @enemy_grid[y][x] = '*'
     when Symbol # hit
       puts 'hit'
-      $enemy_grid[y][x] = [ value ]
+      @enemy_grid[y][x] = [ value ]
     when Array, '*' # you already shot there
       puts 'try again'
   else
     puts 'oops'
   end
 end
-
 
 # ------------- TEST -------------
 
@@ -243,10 +241,9 @@ end
 # :c => occupied
 # [ :c ] => hit
 
-
 # set game state and do it with global vars
 
-$score = {
+@score = {
   :player => {
     :a => { :hits => 0, :sunk => false },
     :b => { :hits => 0, :sunk => false },
@@ -263,9 +260,11 @@ $score = {
   }
 }
 
-$player_grid = place_ships
-$enemy_grid = place_ships
-$available_positions = generate_available_positions
-puts
-player_move
-puts
+#@player_grid = place_ships_randomly
+#@enemy_grid = place_ships_randomly
+#@available_positions = generate_available_positions
+#puts
+#player_move
+#puts
+
+print_grid(place_ships_randomly)
