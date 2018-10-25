@@ -28,40 +28,40 @@ module Util
         # choose random adjacent point
         y2, x2 = adjacent_points(y1, x1).sample
 
-        # is it unused and on-grid?
-        if grid[y2][x2].nil?
-          placement << [ y2, x2 ] # place 2nd
+        # only proceed if it's available
+        next if grid[y2][x2]
 
-          if length > 2
+        placement << [ y2, x2 ] # place 2nd
 
-            # anon function to choose randomly between the positions
-            # on either end of the already chosen positions
-            # return position and bool => is position available and on-grid?
-            choose_next_yx = lambda do
-              yx = bookend_points(placement).sample
+        # stop here if destoyer
+        next if length == 2
 
-              {
-                :available => grid[yx.first][yx.last].nil?,
-                :yx => yx
-              }
-            end
+        # anon function to choose randomly between the positions
+        # on either end of the already chosen positions
+        # return position and bool => is position available and on-grid?
+        choose_next_yx = lambda do
+          yx = bookend_points(placement).sample
 
+          {
+            :available => grid[yx.first][yx.last].nil?,
+            :yx => yx
+          }
+        end
+
+        next_yx = choose_next_yx.call
+
+        if next_yx[:available]
+          placement << next_yx[:yx] # place 3rd
+
+          if length > 3
             next_yx = choose_next_yx.call
 
             if next_yx[:available]
-              placement << next_yx[:yx] # place 3rd
+              placement << next_yx[:yx] # place 4th
 
-              if length > 3
+              if length == 5
                 next_yx = choose_next_yx.call
-
-                if next_yx[:available]
-                  placement << next_yx[:yx] # place 4th
-
-                  if length == 5
-                    next_yx = choose_next_yx.call
-                    placement << next_yx[:yx] if next_yx[:available] # place 5th
-                  end
-                end
+                placement << next_yx[:yx] if next_yx[:available] # place 5th
               end
             end
           end
@@ -103,40 +103,40 @@ module Util
         # choose random adjacent point
         y2, x2 = adjacent_points(y1, x1).sample
 
-        # is it unused and on-grid?
-        if available_isolated_point?(grid, y2, x2)
-          placement << [ y2, x2 ] # place 2nd
+        # only proceed if it's available and not touching another ship
+        next unless available_isolated_point?(grid, y2, x2)
 
-          if length > 2
+        placement << [ y2, x2 ] # place 2nd
 
-            # anon function to choose randomly between the positions
-            # on either end of the already chosen positions
-            # return position and bool => is position available and on-grid?
-            choose_next_yx = lambda do
-              yx = bookend_points(placement).sample
+        # stop here if destoyer
+        next if length == 2
 
-              {
-                :available => available_isolated_point?(grid, yx.first, yx.last),
-                :yx => yx
-              }
-            end
+        # anon function to choose randomly between the positions
+        # on either end of the already chosen positions
+        # return position and bool => is position available and on-grid?
+        choose_next_yx = lambda do
+          yx = bookend_points(placement).sample
 
+          {
+            :available => available_isolated_point?(grid, yx.first, yx.last),
+            :yx => yx
+          }
+        end
+
+        next_yx = choose_next_yx.call
+
+        if next_yx[:available]
+          placement << next_yx[:yx] # place 3rd
+
+          if length > 3
             next_yx = choose_next_yx.call
 
             if next_yx[:available]
-              placement << next_yx[:yx] # place 3rd
+              placement << next_yx[:yx] # place 4th
 
-              if length > 3
+              if length == 5
                 next_yx = choose_next_yx.call
-
-                if next_yx[:available]
-                  placement << next_yx[:yx] # place 4th
-
-                  if length == 5
-                    next_yx = choose_next_yx.call
-                    placement << next_yx[:yx] if next_yx[:available] # place 5th
-                  end
-                end
+                placement << next_yx[:yx] if next_yx[:available] # place 5th
               end
             end
           end
