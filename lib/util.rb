@@ -33,23 +33,19 @@ module Util
 
         placement << [ y2, x2 ] # place 2nd
 
-        # place 3rd
-        next if length == 2
-        y3, x3 = bookend_points(placement).sample
-        next if grid[y3][x3]
-        placement << [ y3, x3 ]
+        # place 3rd, 4th, 5th
+        count = 2
 
-        # place 4th
-        next if length == 3
-        y4, x4 = bookend_points(placement).sample
-        next if grid[y4][x4]
-        placement << [ y4, x4 ]
+        3.times do
+          next if length == count
 
-        # place 5th
-        next if length == 4
-        y5, x5 = bookend_points(placement).sample
-        next if grid[y5][x5]
-        placement << [ y5, x5 ]
+          y, x = bookend_points(placement).sample
+
+          next if grid[y][x]
+
+          placement << [ y, x ]
+          count += 1
+        end
       end
 
       placement.each { |e| grid[e.first][e.last] = k } # write ship to grid
@@ -92,23 +88,19 @@ module Util
 
         placement << [ y2, x2 ] # place 2nd
 
-        # place 3rd
-        next if length == 2
-        y3, x3 = bookend_points(placement).sample
-        next unless available_isolated_point?(grid, y3, x3)
-        placement << [ y3, x3 ]
+        # place 3rd, 4th, 5th
+        count = 2
 
-        # place 4th
-        next if length == 3
-        y4, x4 = bookend_points(placement).sample
-        next unless available_isolated_point?(grid, y4, x4)
-        placement << [ y4, x4 ]
+        3.times do
+          next if length == count
 
-        # place 5th
-        next if length == 4
-        y5, x5 = bookend_points(placement).sample
-        next unless available_isolated_point?(grid, y5, x5)
-        placement << [ y5, x5 ]
+          y, x = bookend_points(placement).sample
+
+          next unless available_isolated_point?(grid, y, x)
+
+          placement << [ y, x ]
+          count += 1
+        end
       end
 
       placement.each { |e| grid[e.first][e.last] = k } # write ship to grid
