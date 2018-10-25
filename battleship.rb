@@ -267,4 +267,10 @@ end
 #player_move
 #puts
 
+puts
 print_grid(place_ships_randomly)
+puts
+puts
+print_grid(place_ships_randomly_no_touching)
+puts
+
