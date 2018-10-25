@@ -33,42 +33,26 @@ module Util
 
         placement << [ y2, x2 ] # place 2nd
 
-        # stop here if destoyer
+        # place 3rd
         next if length == 2
+        y3, x3 = bookend_points(placement).sample
+        next if grid[y3][x3]
+        placement << [ y3, x3 ]
 
-        # anon function to choose randomly between the positions
-        # on either end of the already chosen positions
-        # return position and bool => is position available and on-grid?
-        choose_next_yx = lambda do
-          yx = bookend_points(placement).sample
+        # place 4th
+        next if length == 3
+        y4, x4 = bookend_points(placement).sample
+        next if grid[y4][x4]
+        placement << [ y4, x4 ]
 
-          {
-            :available => grid[yx.first][yx.last].nil?,
-            :yx => yx
-          }
-        end
-
-        next_yx = choose_next_yx.call
-
-        if next_yx[:available]
-          placement << next_yx[:yx] # place 3rd
-
-          if length > 3
-            next_yx = choose_next_yx.call
-
-            if next_yx[:available]
-              placement << next_yx[:yx] # place 4th
-
-              if length == 5
-                next_yx = choose_next_yx.call
-                placement << next_yx[:yx] if next_yx[:available] # place 5th
-              end
-            end
-          end
-        end
+        # place 5th
+        next if length == 4
+        y5, x5 = bookend_points(placement).sample
+        next if grid[y5][x5]
+        placement << [ y5, x5 ]
       end
 
-      placement.each { |e| grid[e.first][e.last] = k } # place all
+      placement.each { |e| grid[e.first][e.last] = k } # write ship to grid
     end
 
     grid
@@ -108,42 +92,26 @@ module Util
 
         placement << [ y2, x2 ] # place 2nd
 
-        # stop here if destoyer
+        # place 3rd
         next if length == 2
+        y3, x3 = bookend_points(placement).sample
+        next unless available_isolated_point?(grid, y3, x3)
+        placement << [ y3, x3 ]
 
-        # anon function to choose randomly between the positions
-        # on either end of the already chosen positions
-        # return position and bool => is position available and on-grid?
-        choose_next_yx = lambda do
-          yx = bookend_points(placement).sample
+        # place 4th
+        next if length == 3
+        y4, x4 = bookend_points(placement).sample
+        next unless available_isolated_point?(grid, y4, x4)
+        placement << [ y4, x4 ]
 
-          {
-            :available => available_isolated_point?(grid, yx.first, yx.last),
-            :yx => yx
-          }
-        end
-
-        next_yx = choose_next_yx.call
-
-        if next_yx[:available]
-          placement << next_yx[:yx] # place 3rd
-
-          if length > 3
-            next_yx = choose_next_yx.call
-
-            if next_yx[:available]
-              placement << next_yx[:yx] # place 4th
-
-              if length == 5
-                next_yx = choose_next_yx.call
-                placement << next_yx[:yx] if next_yx[:available] # place 5th
-              end
-            end
-          end
-        end
+        # place 5th
+        next if length == 4
+        y5, x5 = bookend_points(placement).sample
+        next unless available_isolated_point?(grid, y5, x5)
+        placement << [ y5, x5 ]
       end
 
-      placement.each { |e| grid[e.first][e.last] = k } # place all
+      placement.each { |e| grid[e.first][e.last] = k } # write ship to grid
     end
 
     grid
@@ -152,6 +120,11 @@ module Util
   # return random point
   def random_point
     [ rand(0..9), rand(0..9) ]
+  end
+
+  # is a given point nil and not occupied by another ship?
+  def available_point?(grid, y, x)
+    grid[y][x].nil?
   end
 
   # return the subset of points that are on-grid
