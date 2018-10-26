@@ -18,6 +18,68 @@ INDENT = 4
 TRUE_FALSE = [ true, false ].sample # random bool decider
 DEBUG = ARGV.first ? true : false
 
+def validate_player_grid(grid)
+  begin
+
+    # validate the basics
+
+    raise unless grid.class == Array
+    raise unless grid.length == 10
+
+    grid.each do |e|
+      raise unless e.class == Array
+      raise unless e.length == 10
+    end
+
+    all_values = grid.flatten
+    non_nil_values = all_values.compact
+
+    raise unless all_values.count(nil) == 83
+    raise unless non_nil_values.length == 17
+
+    SHIPS.each { |k, v| raise unless non_nil_values.count(k) == v[:length] }
+
+    # validate that all ship's points are linear + contiguous
+
+    positions = grid.each_with_object({}).with_index do |(row, h), row_i|
+      row.each_with_index do |point, point_i|
+        if point
+          if h[point]
+            h[point] << [ row_i, point_i ]
+          else
+            h[point] = [ [ row_i, point_i ] ]
+          end
+        end
+      end
+    end
+
+    raise unless SHIPS.keys.sort == positions.keys.sort
+
+    positions.each do |k, v|
+      raise unless SHIPS[k][:length] == v.length
+
+      ys = v.map(&:first).uniq.sort
+      xs = v.map(&:last).uniq.sort
+
+      horizontal_check, vertical_check = 0, 0
+
+      [ ys, xs ].each do |e|
+        if e.length == 1
+          horizontal_check += 1
+        elsif e.last - e.first + 1 == e.length
+          vertical_check += 1
+        end
+      end
+
+      raise unless horizontal_check == 1
+      raise unless vertical_check == 1
+    end
+  rescue
+    puts '[ERROR] malformed player grid'
+    exit 1
+  end
+end
+
 # display single 10x10 grid
 # use for player ship placment
 def print_grid(data)
@@ -260,17 +322,9 @@ end
   }
 }
 
-#@player_grid = place_ships_randomly
-#@enemy_grid = place_ships_randomly
-#@available_positions = generate_available_positions
-#puts
-#player_move
-#puts
-
+g = place_ships_randomly
 puts
-print_grid(place_ships_randomly)
+print_grid(g)
 puts
+validate_player_grid(g)
 puts
-print_grid(place_ships_randomly_no_touching)
-puts
-

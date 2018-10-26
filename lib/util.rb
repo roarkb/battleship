@@ -130,7 +130,7 @@ module Util
   end
 
   # return on-grid bookend points
-  # assumes points in points array are linier + contiguous
+  # assumes points in points array are linear + contiguous
   def bookend_points(points)
     points.sort!
 
