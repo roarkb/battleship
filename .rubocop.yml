@@ -12,6 +12,8 @@ Layout/LeadingCommentSpace:
   Enabled: false
 Layout/SpaceInsideArrayLiteralBrackets:
   Enabled: false
+Layout/SpaceInsidePercentLiteralDelimiters:
+  Enabled: false
 
 Metrics/AbcSize:
   Enabled: false

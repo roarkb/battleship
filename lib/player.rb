@@ -5,13 +5,13 @@
 # letter, number format (eg. "a1")
 # the game board will handle the 0 => a translations
 class Player
-  extend Util
-
   def initialize
-    @player_grid = place_ships
-    @enemy_grid = Array.new(10) { Array.new(10) } # start off with empty 10x10 grid
+    validate_subclass
 
+    @player_grid = place_ships
     validate_player_grid
+
+    @enemy_grid = Array.new(10) { Array.new(10) } # start off with empty 10x10 grid
   end
 
   # methods to be overwritten by individual AI classes to implement their special strategies
@@ -30,7 +30,7 @@ class Player
   # a typical turn will go:
   #   player1.attack
   #   player2.respond
-  #   player1.record_damage
+  #   player1.record
 
   # call AI's next_move method to get the y, x
   # validate it is a valid move
@@ -46,10 +46,21 @@ class Player
 
   # write you attack results to enemy_grid
   # verdict can be false, true, ship symbol
-  def record_damage(y, x, verdict)
+  def record(y, x, verdict)
   end
 
   private
+
+  # ensure AI subclass has implimented AI methods and has not overwritten gameplay methods
+  def validate_subclass
+    begin
+      %i[ place_ships next_move ].each { |e| raise if method(e).owner.name == 'Player' }
+      %i[ attack respond record ].each { |e| raise unless method(e).owner.name == 'Player' }
+    rescue
+      puts '[ERROR] AI is cheating'
+      exit 1
+    end
+  end
 
   def validate_player_grid
     begin
