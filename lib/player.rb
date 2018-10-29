@@ -5,6 +5,9 @@
 # letter, number format (eg. "a1")
 # the game board will handle the 0 => a translations
 class Player
+  # create the player and enemy boards used to track gameplay
+  # validate that player AI is not cheeting
+  # sure, player AI could simply overwrite the initialize and bypass all validation but that's a Ruby! `\_(")_/`
   def initialize
     validate_subclass
 
@@ -64,9 +67,7 @@ class Player
 
   def validate_player_grid
     begin
-
       # validate the basics
-
       raise unless @player_grid.class == Array
       raise unless @player_grid.length == 10
 
@@ -84,7 +85,6 @@ class Player
       SHIPS.each { |k, v| raise unless non_nil_values.count(k) == v[:length] }
 
       # validate that all ship's points are linear + contiguous
-
       positions = @player_grid.each_with_object({}).with_index do |(row, h), row_i|
         row.each_with_index do |point, point_i|
           if point
