@@ -54,11 +54,19 @@ class Player
 
   private
 
-  # ensure AI subclass has implimented AI methods and has not overwritten gameplay methods
+  # ensure AI subclass is setup correctly
   def validate_subclass
+    superclass_name = 'Player'
+
     begin
-      %i[ place_ships next_move ].each { |e| raise if method(e).owner.name == 'Player' }
-      %i[ attack respond record ].each { |e| raise unless method(e).owner.name == 'Player' }
+      # ensure AI inherits from Player
+      raise unless self.class.superclass.name == superclass_name
+
+      # ensure AI has implemented AI methods
+      %i[ place_ships next_move ].each { |e| raise if method(e).owner.name == superclass_name }
+
+      # ensure AI has NOT overwritten gameplay  methods
+      %i[ attack respond record ].each { |e| raise unless method(e).owner.name == superclass_name }
     rescue
       puts '[ERROR] AI is cheating'
       exit 1
