@@ -47,7 +47,7 @@ class Player
   def respond(y, x) # (0-9, 0-9)
   end
 
-  # write you attack results to enemy_grid
+  # write your attack results to enemy_grid
   # verdict can be false, true, ship symbol
   def record(y, x, verdict)
   end
