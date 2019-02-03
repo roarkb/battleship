@@ -5,6 +5,8 @@
 # letter, number format (eg. "a1")
 # the game board will handle the 0 => a translations
 class Player
+  attr_reader :player_grid, :enemy_grid, :damage
+
   # create the player and enemy boards used to track gameplay
   # validate that player AI is not cheeting
   # sure, player AI could simply overwrite the initialize and bypass all validation but that's a Ruby! `\_(")_/`
@@ -15,6 +17,7 @@ class Player
     validate_player_grid
 
     @enemy_grid = Array.new(10) { Array.new(10) } # start off with empty 10x10 grid
+    @damage = {} # track player ship damage
   end
 
   # methods to be overwritten by individual AI classes to implement their special strategies
@@ -39,17 +42,40 @@ class Player
   # validate it is a valid move
   # return y, x
   def attack
+    y, x = next_move
+
+    # TODO: validate
   end
 
-  # determine if hit/miss/sink (if so, which ship)
+  # after getting attacked, determine if hit/miss/sink (if so, which ship)
   # write y, x to player_grid and enemy_grid
   # return false if miss, true if hit, ship symbol if hit and sink
+  # TODO: how to respond with "you already hit me there" OR "you win" ?
   def respond(y, x) # (0-9, 0-9)
+    target = @player_grid[y][x]
+
+    if target # hit
+      if @damage.key?(target)
+        @damage[target] += 1
+      else
+        @damage[target] = 1
+      end
+
+      @damage[target] == SHIPS[target].length ? target : true
+    else # miss
+      false
+    end
   end
 
-  # write your attack results to enemy_grid
+  # after player responded to your attack, write your attack results to enemy_grid
   # verdict can be false, true, ship symbol
   def record(y, x, verdict)
+    if @enemy_grid[y][x]
+      puts '[ERROR] location in enemy grid is already taken'
+      exit 1
+    else
+      @enemy_grid[y][x] = verdict
+    end
   end
 
   private

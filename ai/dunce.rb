@@ -1,7 +1,11 @@
 require_relative '../lib/player'
 require_relative '../lib/util'
 
-class Random < Player
+# a fool with no strategy, will place their ships randomly
+# and choose a random available space when making a move
+class Dunce < Player
+  include Util
+
   # return a 10x10 2d array
   def place_ships
     place_ships_randomly

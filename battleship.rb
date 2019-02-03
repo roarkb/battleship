@@ -260,9 +260,43 @@ end
   }
 }
 
-g = place_ships_randomly
+#g = place_ships_randomly
+#puts
+#print_grid(g)
+#puts
+#validate_player_grid(g)
+#puts
+
+# ---------- PVP test ----------
+
+# load AI
+require_relative 'ai/dunce'
 puts
-print_grid(g)
+
+# player 1 place ships
+p1 = Dunce.new
+p p1.player_grid
 puts
-validate_player_grid(g)
+
+# player 2 place ships
+p2 = Dunce.new
+p p2.player_grid
 puts
+
+# player 1 call out a move
+y, x = p1.attack
+p [ y, x ]
+puts
+
+# player 2 respond to player 1
+p verdict = p2.respond(y, x)
+puts
+
+# player 1 records verdict
+p1.record(y, x, verdict)
+p p1.enemy_grid
+puts
+
+#
+#
+#
