@@ -8,6 +8,8 @@ Layout/CaseIndentation:
   Enabled: false
 Layout/ElseAlignment:
   Enabled: false
+Layout/EmptyComment:
+  Enabled: false
 Layout/IndentationWidth:
   Enabled: false
 Layout/LeadingCommentSpace:
@@ -36,7 +38,7 @@ Metrics/PerceivedComplexity:
 
 Naming/HeredocDelimiterNaming:
   Enabled: false
-Naming/UncommunicativeMethodParamName:
+Naming/MethodParameterName:
   Enabled: false
 
 Style/CommentedKeyword:
